@@ -8,7 +8,6 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setTheme } from '@/store/themeSlice';
 
@@ -16,39 +15,67 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((state: any) => state.theme.theme);
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Single useEffect to handle all initialization
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
     const root = window.document.documentElement;
-    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleThemeChange = () => {
+      const isSystemDark = mediaQuery.matches;
+      const shouldBeDark = theme === 'dark' || (theme === 'system' && isSystemDark);
+      
+      setIsDark(shouldBeDark);
+      if (shouldBeDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
+    // Initial setup
+    handleThemeChange();
+    setMounted(true);
+
+    // Listen for system theme changes
+    mediaQuery.addEventListener('change', handleThemeChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
+  }, [theme]);
 
   const toggleTheme = () => {
-    if (theme === 'light') dispatch(setTheme('dark'));
-    else if (theme === 'dark') dispatch(setTheme('system'));
-    else dispatch(setTheme('light'));
+    const newTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+    dispatch(setTheme(newTheme));
+    localStorage.setItem('theme', newTheme);
   };
 
-  const themeIcon = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ? (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" /></svg>
-    )
-    : (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 6.66l-.71-.71M4.05 4.93l-.71-.71" /></svg>
-    );
-  const systemIcon = (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M9 9h6v6H9z" /></svg>
+  // Icons
+  const moonIcon = (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+    </svg>
   );
-  const showIcon = theme === 'system' ? systemIcon : themeIcon;
+  
+  const sunIcon = (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 6.66l-.71-.71M4.05 4.93l-.71-.71" />
+    </svg>
+  );
+  
+  const systemIcon = (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <path d="M9 9h6v6H9z" />
+    </svg>
+  );
+
+  // Use systemIcon for initial render to avoid hydration mismatch
+  const showIcon = !mounted ? systemIcon : theme === 'system' ? systemIcon : isDark ? moonIcon : sunIcon;
+  const buttonTitle = !mounted ? 'Theme' : theme === 'system' ? 'System' : `${theme.charAt(0).toUpperCase()}${theme.slice(1)} mode`;
 
   return (
     <>
@@ -84,19 +111,37 @@ const Navbar = () => {
         }
       `}</style>
 
-      <header className="fixed top-0 left-0 w-full flex flex-row items-center justify-between px-4 md:px-5 py-3 h-16 text-white shadow-lg z-50 border-b border-purple-700/40 backdrop-blur-md bg-black ">
+      <header className={`fixed top-0 left-0 w-full flex flex-row items-center justify-between px-4 md:px-5 py-3 h-16 text-white shadow-lg z-50 border-b border-purple-700/40 backdrop-blur-md ${mounted ? 'bg-black' : ''}`}>
         {/* Left-side navigation links - Responsive */}
         <nav className="hidden md:flex gap-3 text-lg font-semibold">
           <Link href="/" className="transform transition-transform duration-300 hover:scale-105 font-semibold">Home</Link>
           <Link href="/about" className="transform transition-transform duration-300 hover:scale-105 font-semibold">About</Link>
           <Link href="/services" className="transform transition-transform duration-300 hover:scale-105 font-semibold">Services</Link>
           <Link href="/contact" className="transform transition-transform duration-300 hover:scale-105 font-semibold">Contact</Link>
-        </nav>
-
-        {/* Mobile menu button */}
-        <button className="block md:hidden text-white text-3xl p-2 rounded-lg hover:bg-purple-800/30 transition-colors duration-200" id="menu-toggle" aria-label="Open menu">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-8 h-8">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+        </nav>        {/* Mobile menu button */}
+        <button          className="block md:hidden text-3xl p-2 rounded-lg hover:bg-purple-800/30 transition-all duration-200" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        >          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            className="w-8 h-8 transition-colors duration-200"
+            stroke="url(#menuIconGradient)"
+            strokeWidth={2}
+          >
+            <defs>
+              <linearGradient id="menuIconGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style={{ stopColor: '#a78bfa' }} />
+                <stop offset="50%" style={{ stopColor: '#f472b6' }} />
+                <stop offset="100%" style={{ stopColor: '#ef4444' }} />
+              </linearGradient>
+            </defs>
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 8h16M4 16h16"}
+            />
           </svg>
         </button>
 
@@ -106,7 +151,7 @@ const Navbar = () => {
             <span
               className="font-extrabold bg-gradient-to-r from-purple-400 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent"
             >
-              VI-Pdf-Merger
+              VI-Pdf-Solutions
             </span>
           </h1>
         </div>
@@ -124,40 +169,75 @@ const Navbar = () => {
           <SignedIn>
         <UserButton appearance={{ elements: { userButtonAvatarBox: 'ring-2 ring-purple-500' } }} />
           </SignedIn>
-          {/* Theme toggle button */}
-          <button
-        className="ml-2 p-2 rounded-lg hover:bg-purple-800/30 transition-colors duration-200 border border-transparent hover:border-purple-400"
-        onClick={toggleTheme}
-        title={theme === 'system' ? 'System' : theme.charAt(0).toUpperCase() + theme.slice(1) + ' mode'}
-        aria-label="Toggle theme"
-        type="button"
+          {/* Theme toggle button */}          <button
+            className="ml-2 p-2 rounded-lg hover:bg-purple-800/30 transition-colors duration-200 border border-transparent hover:border-purple-400"
+            onClick={toggleTheme}
+            title={buttonTitle}
+            aria-label="Toggle theme"
+            type="button"
           >
-        {showIcon}
+            {showIcon}
           </button>
         </div>
-      </header>
-
-      {/* Mobile Navigation Menu */}
-      <nav className="md:hidden fixed top-16 left-0 w-full bg-gradient-to-b from-black via-purple-950 to-black/90 text-white hidden flex-col space-y-4 p-6 shadow-2xl z-40 rounded-b-2xl border-t border-purple-700/40 backdrop-blur-md" id="mobile-menu">
-        <Link href="/" className="block font-bold text-lg rounded-lg px-3 py-2 hover:bg-purple-800/30 hover:scale-105 transition-all duration-200">Home</Link>
-        <Link href="/about" className="block font-bold text-lg rounded-lg px-3 py-2 hover:bg-purple-800/30 hover:scale-105 transition-all duration-200">About</Link>
-        <Link href="/services" className="block font-bold text-lg rounded-lg px-3 py-2 hover:bg-purple-800/30 hover:scale-105 transition-all duration-200">Services</Link>
-        <Link href="/contact" className="block font-bold text-lg rounded-lg px-3 py-2 hover:bg-purple-800/30 hover:scale-105 transition-all duration-200">Contact</Link>
-      </nav>
-
-      {/* Mobile Menu Toggle Script */}
-      <script>
-        {`
-          document.getElementById("menu-toggle").addEventListener("click", function() {
-            const menu = document.getElementById("mobile-menu");
-            menu.classList.toggle("hidden");
-          });
-        `}
-      </script>
+      </header>      {/* Mobile Navigation Menu */}
+      <nav 
+        className={`md:hidden fixed top-16 left-0 w-full flex-col space-y-4 p-6 shadow-2xl z-40 rounded-b-2xl backdrop-blur-md transform transition-all duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-b from-black via-purple-950 to-black/90 border-t border-purple-700/40' 
+            : 'bg-gradient-to-b from-white via-purple-50 to-white/90 border-t border-purple-200'
+        } ${
+          isMobileMenuOpen ? 'flex opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+        }`}
+      >
+        <Link 
+          href="/" 
+          className={`block font-bold text-lg rounded-lg px-3 py-2 transition-all duration-200 ${
+            isDark 
+              ? 'text-white hover:bg-purple-800/30' 
+              : 'text-purple-900 hover:bg-purple-100'
+          } hover:scale-105`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Home
+        </Link>
+        <Link 
+          href="/about" 
+          className={`block font-bold text-lg rounded-lg px-3 py-2 transition-all duration-200 ${
+            isDark 
+              ? 'text-white hover:bg-purple-800/30' 
+              : 'text-purple-900 hover:bg-purple-100'
+          } hover:scale-105`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          About
+        </Link>
+        <Link 
+          href="/services" 
+          className={`block font-bold text-lg rounded-lg px-3 py-2 transition-all duration-200 ${
+            isDark 
+              ? 'text-white hover:bg-purple-800/30' 
+              : 'text-purple-900 hover:bg-purple-100'
+          } hover:scale-105`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Services
+        </Link>
+        <Link 
+          href="/contact" 
+          className={`block font-bold text-lg rounded-lg px-3 py-2 transition-all duration-200 ${
+            isDark 
+              ? 'text-white hover:bg-purple-800/30' 
+              : 'text-purple-900 hover:bg-purple-100'
+          } hover:scale-105`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Contact
+        </Link>
       {/* Spacer to prevent content from being hidden behind navbar */}
-      <div className="h-16 w-full bg-transparent" aria-hidden="true"></div>
+      <div className="h-16 w-full" style={{ background: 'transparent' }} aria-hidden="true"></div>
+      </nav>
     </>
   );
 };
 
-export default Navbar
+export default Navbar;

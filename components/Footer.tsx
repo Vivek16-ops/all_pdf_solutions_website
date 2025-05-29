@@ -7,16 +7,47 @@ const paymentLogos = [
   { src: '/visa.png', alt: 'Visa' },
   { src: '/rupay.png', alt: 'RuPay' },
   { src: '/mastercard.png', alt: 'Mastercard' },
-  { src: '/american_express.png', alt: 'American EExpress' }, // Placeholder, replace with real payment logos
+  { src: '/american_express.png', alt: 'American EExpress' },
 ];
 
 const Footer = () => {
   const theme = useAppSelector((state: any) => state.theme.theme);
-  const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [mounted, setMounted] = React.useState(false);
+  const [isDark, setIsDark] = React.useState(false);
 
-  const footerClass = isDark
-    ? 'w-full bg-gradient-to-br from-black via-purple-950 to-black text-gray-200 border-t border-purple-800/40 py-10 px-4'
-    : 'w-full bg-gradient-to-br from-purple-50 via-pink-50 to-white text-gray-800 border-t border-purple-200 py-10 px-4';
+  React.useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDark(
+      theme === 'dark' || 
+      (theme === 'system' && darkModeMediaQuery.matches)
+    );
+    setMounted(true);
+
+    const updateTheme = () => {
+      setIsDark(
+        theme === 'dark' || 
+        (theme === 'system' && darkModeMediaQuery.matches)
+      );
+    };
+
+    darkModeMediaQuery.addEventListener('change', updateTheme);
+    return () => darkModeMediaQuery.removeEventListener('change', updateTheme);
+  }, [theme]);
+
+  // Return a light theme version for server-side rendering and initial mount
+  if (!mounted) {
+    return (
+      <footer className="w-full transition-colors duration-300 bg-gradient-to-br from-purple-50 via-pink-50 to-white border-t border-purple-200 py-10 px-4">
+        <div className="max-w-7xl mx-auto h-40" />
+      </footer>
+    );
+  }
+
+  const footerClass = `w-full transition-colors duration-300 ${
+    isDark
+      ? 'bg-gradient-to-br from-black via-purple-950 to-black text-gray-200 border-t border-purple-800/40'
+      : 'bg-gradient-to-br from-purple-50 via-pink-50 to-white text-gray-800 border-t border-purple-200'
+  } py-10 px-4`;
 
   const navLinkClass = isDark
     ? 'hover:text-purple-400 transition-colors'
