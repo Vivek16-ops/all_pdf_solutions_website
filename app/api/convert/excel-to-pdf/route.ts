@@ -3,32 +3,32 @@ import ExcelJS from 'exceljs';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 // Dynamic imports for pdfmake to work in Next.js environment
-let pdfMakeModule: any;
 let pdfFontsModule: any;
 
-async function initializePdfMake() {
+let pdfMakeModule: any = null;
+
+export async function initializePdfMake() {
   if (!pdfMakeModule) {
     try {
-      // Dynamic imports to ensure proper loading in Next.js
-      pdfMakeModule = await import('pdfmake/build/pdfmake');
-      pdfFontsModule = await import('pdfmake/build/vfs_fonts');
-      
-      // Initialize virtual file system for fonts
-      if (pdfMakeModule.default) {
-        pdfMakeModule = pdfMakeModule.default;
-      }
-      if (pdfFontsModule.default) {
-        pdfFontsModule = pdfFontsModule.default;
-      }
-      
-      pdfMakeModule.vfs = pdfFontsModule.pdfMake?.vfs;
+      const pdfMake = await import('pdfmake/build/pdfmake');
+      const pdfFonts = await import('pdfmake/build/vfs_fonts');
+
+      const realPdfMake = pdfMake.default || pdfMake;
+      const realPdfFonts = pdfFonts.default || pdfFonts;
+
+      // ✅ Fix: Assign the correct vfs
+      realPdfMake.vfs = realPdfFonts.vfs;
+
+      pdfMakeModule = realPdfMake;
     } catch (error) {
       console.error('Error initializing pdfMake:', error);
       throw new Error('Failed to initialize PDF generator');
     }
   }
+
   return pdfMakeModule;
 }
+
 
 interface ExcelCell {
   value: string;
