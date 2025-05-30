@@ -3,7 +3,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import Footer from '@/components/Footer';
 import { toast } from 'react-hot-toast';
-import { ReduxProvider } from '@/store/Provider';
+import ReduxProvider from '@/store/Provider';
 import Navbar from '@/components/Navbar';
 
 const ContactPageContent = () => {
