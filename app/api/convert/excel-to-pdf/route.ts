@@ -3,8 +3,6 @@ import ExcelJS from 'exceljs';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 // Dynamic imports for pdfmake to work in Next.js environment
-let pdfFontsModule: any;
-
 let pdfMakeModule: any = null;
 
 export async function initializePdfMake() {
