@@ -36,18 +36,13 @@ interface ExcelCell {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit
 
 export async function POST(req: NextRequest) {
-  console.log('Starting conversion request...');
   try {
     // Initialize pdfMake first
-    console.log('Initializing PDF generator...');
     const pdfMake = await initializePdfMake();
     
     // Get the file from form data
     const formData = await req.formData();
-    const file = formData.get('file');
-
-    if (!file || !(file instanceof Blob)) {
-      console.log('No valid file provided');
+    const file = formData.get('file');    if (!file || !(file instanceof Blob)) {
       return NextResponse.json(
         { success: false, message: 'No valid file provided' },
         { status: 400 }
