@@ -7,6 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose } from "react-icons/io";
+import { ServiceSections } from '@/components/service-components';
 
 const PDFtoWordPage = () => {
   const { isSignedIn } = useAuth();
@@ -167,13 +168,62 @@ const PDFtoWordPage = () => {
                     ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white'
                     : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-md'
               }`}
-            >
-              {!isSignedIn 
+            >              {!isSignedIn 
                 ? 'Login Required' 
                 : isConverting 
                   ? 'Converting...' 
-                  : 'Convert to Word'}
-            </button>
+                  : 'Convert to Word'}            </button>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections 
+            serviceName="PDF to Word Converter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload PDF",
+                desc: "Drag & drop or click to select your PDF file",
+                icon: "📄",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                step: "2",
+                title: "Convert to Word",
+                desc: "Our AI extracts text and preserves formatting",
+                icon: "📝",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                step: "3",
+                title: "Download Word",
+                desc: "Get your editable Word document instantly",
+                icon: "💾",
+                color: "from-green-500 to-emerald-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Sandra Williams",
+                role: "Content Writer",
+                text: "Amazing tool! Converted my PDF research papers to Word documents perfectly. Saved me hours of retyping.",
+                rating: 5,
+                avatar: "✍️"
+              },
+              {
+                name: "Carlos Martinez",
+                role: "Legal Assistant",
+                text: "Perfect for converting legal documents to editable format. The accuracy is impressive!",
+                rating: 5,
+                avatar: "⚖️"
+              },
+              {
+                name: "Amy Chen",
+                role: "Student",
+                text: "Great for converting PDF textbooks to Word format for note-taking. Works flawlessly!",
+                rating: 5,
+                avatar: "📚"
+              }
+            ]}
+            callToActionMessage="Ready to convert your PDF to Word? Upload your file and start editing!"          />
           </div>
         </div>
       </main>

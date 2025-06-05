@@ -7,6 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose } from "react-icons/io";
+import { ServiceSections } from '@/components/service-components';
 
 const WordToPNGPage = () => {
   const { isSignedIn } = useAuth();
@@ -167,13 +168,62 @@ const WordToPNGPage = () => {
                     ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white'
                     : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-md'
               }`}
-            >
-              {!isSignedIn 
+            >              {!isSignedIn 
                 ? 'Login Required' 
                 : isConverting 
                   ? 'Converting...' 
-                  : 'Convert to PNG'}
-            </button>
+                  : 'Convert to PNG'}            </button>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections 
+            serviceName="Word to PNG Converter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload Word",
+                desc: "Drag & drop or click to select your Word document",
+                icon: "📝",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                step: "2",
+                title: "Convert to PNG",
+                desc: "Our tool converts your Word document to transparent PNG images",
+                icon: "🖼️",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                step: "3",
+                title: "Download Images",
+                desc: "Get your PNG images with transparency support",
+                icon: "📥",
+                color: "from-green-500 to-emerald-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Alex Thompson",
+                role: "Web Designer",
+                text: "Perfect for creating transparent images from Word docs. Great for web design projects!",
+                rating: 5,
+                avatar: "💻"
+              },
+              {
+                name: "Maria Rodriguez",
+                role: "Presentation Designer",
+                text: "Excellent tool for converting documents to PNG with transparency. Quality is superb!",
+                rating: 5,
+                avatar: "🎯"
+              },
+              {
+                name: "James Wilson",
+                role: "Marketing Manager",
+                text: "Great for creating branded images from our Word templates. Transparent backgrounds are perfect!",
+                rating: 5,
+                avatar: "📊"
+              }
+            ]}
+            callToActionMessage="Ready to convert Word to PNG? Upload your document and create transparent images!"          />
           </div>
         </div>
       </main>

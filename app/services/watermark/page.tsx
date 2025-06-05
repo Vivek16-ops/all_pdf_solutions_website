@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { ServiceSections } from '@/components/service-components';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
@@ -272,15 +273,65 @@ const WatermarkPage = () => {
                   {!isSignedIn 
                     ? 'Login Required' 
                     : isProcessing 
-                      ? 'Adding Watermark...' 
-                      : 'Add Watermark'}
+                      ? 'Adding Watermark...'                      : 'Add Watermark'}
                 </button>
               </div>
             )}
+
+          {/* Enhanced Features Section */}
+          <ServiceSections
+            serviceName="PDF Watermark Tool"
+            steps={[
+              {
+                step: "1",
+                title: "Upload PDF File",
+                desc: "Select and upload the PDF file you want to add a watermark to",
+                icon: "📤",
+                color: "from-cyan-400 to-blue-500"
+              },
+              {
+                step: "2",
+                title: "Choose Watermark",
+                desc: "Add text watermark or upload image watermark with custom opacity settings",
+                icon: "🏷️",
+                color: "from-blue-400 to-purple-500"
+              },
+              {
+                step: "3",
+                title: "Download Protected PDF",
+                desc: "Get your watermarked PDF with professional protection and branding",
+                icon: "🔒",
+                color: "from-purple-400 to-pink-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Jennifer Davis",
+                role: "Brand Manager",
+                text: "Perfect for adding our company logo to official documents. Professional watermarks every time!",
+                rating: 5,
+                avatar: "👩‍💼"
+              },
+              {
+                name: "Robert Kim",
+                role: "Photographer",
+                text: "Great tool for watermarking my portfolio PDFs. Protects my work while looking professional.",
+                rating: 5,
+                avatar: "📸"
+              },
+              {
+                name: "Anna Martinez",
+                role: "Legal Consultant",
+                text: "Essential for adding confidentiality watermarks to legal documents. Reliable and easy to use!",
+                rating: 5,
+                avatar: "⚖️"
+              }
+            ]}
+            callToActionMessage="Protect your documents with watermarks! Add text or image watermarks to your PDFs now!"
+          />
           </div>
         </div>
-      </main>
-      <Footer />
+      </main>      <Footer />
     </>
   );
 };

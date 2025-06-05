@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { ServiceSections } from '@/components/service-components';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
@@ -173,12 +174,63 @@ const SplitPDFPage = () => {
               {!isSignedIn 
                 ? 'Login Required' 
                 : isProcessing 
-                  ? 'Splitting...' 
-                  : 'Split PDF'}
-            </button>
+                  ? 'Splitting...'                  : 'Split PDF'}            </button>
           </div>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections
+            serviceName="PDF Splitter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload PDF File",
+                desc: "Select and upload the PDF file you want to split into separate documents",
+                icon: "📤",
+                color: "from-green-400 to-blue-500"
+              },
+              {
+                step: "2",
+                title: "Specify Page Ranges",
+                desc: "Enter page ranges or specific pages to extract from your PDF document",
+                icon: "✂️",
+                color: "from-blue-400 to-purple-500"
+              },
+              {
+                step: "3",
+                title: "Download Split Files",
+                desc: "Get your separated PDF files with the exact pages you specified",
+                icon: "📥",
+                color: "from-purple-400 to-pink-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Sarah Williams",
+                role: "Content Editor",
+                text: "Perfect for extracting specific chapters from large documents. Clean splits every time!",
+                rating: 5,
+                avatar: "✏️"
+              },
+              {
+                name: "Michael Zhang",
+                role: "Project Manager",
+                text: "Great tool for breaking down project reports into individual sections. Very efficient!",
+                rating: 5,
+                avatar: "📊"
+              },
+              {
+                name: "Lisa Thompson",
+                role: "Teacher",
+                text: "I use this to split textbooks into individual lessons for my students. Works flawlessly!",
+                rating: 5,
+                avatar: "👩‍🏫"
+              }
+            ]}
+            callToActionMessage="Need to split your PDF? Upload your file and extract specific pages easily!"
+          />
         </div>
       </main>
+      
       <Footer />
     </>
   );

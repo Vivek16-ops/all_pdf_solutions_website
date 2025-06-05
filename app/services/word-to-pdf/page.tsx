@@ -7,6 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose } from "react-icons/io";
+import { ServiceSections } from '@/components/service-components';
 
 const WordToPDFPage = () => {
   const { isSignedIn } = useAuth();
@@ -167,8 +168,7 @@ const WordToPDFPage = () => {
                   : isDark
                     ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white'
                     : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-md'
-              }`}
-            >
+              }`}            >
               {!isSignedIn 
                 ? 'Login Required' 
                 : isConverting 
@@ -176,6 +176,57 @@ const WordToPDFPage = () => {
                   : 'Convert to PDF'}
             </button>
           </div>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections
+            serviceName="Word to PDF Converter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload Word",
+                desc: "Drag & drop or click to select your Word document",
+                icon: "📝",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                step: "2",
+                title: "Convert File",
+                desc: "Our tool converts your Word document to PDF format",
+                icon: "🔄",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                step: "3",
+                title: "Download PDF",
+                desc: "Get your professional PDF document instantly",
+                icon: "📄",
+                color: "from-green-500 to-emerald-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Michael Brown",
+                role: "Business Analyst",
+                text: "Perfect for converting our reports to PDF format. The formatting is always preserved exactly.",
+                rating: 5,
+                avatar: "👨‍💼"
+              },
+              {
+                name: "Jessica Taylor",
+                role: "Student",
+                text: "Great for converting my assignments to PDF. Quick, easy, and the quality is excellent!",
+                rating: 5,
+                avatar: "👩‍🎓"
+              },
+              {
+                name: "Robert Kim",
+                role: "Consultant",
+                text: "Reliable tool for converting proposals to PDF. Professional results every time.",
+                rating: 5,
+                avatar: "👨‍💻"
+              }
+            ]}            callToActionMessage="Ready to convert your Word to PDF? Start now!"
+          />
         </div>
       </main>
       <Footer />

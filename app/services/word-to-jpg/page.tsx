@@ -7,6 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose } from "react-icons/io";
+import { ServiceSections } from '@/components/service-components';
 
 const WordToJPGPage = () => {
   const { isSignedIn } = useAuth();
@@ -190,8 +191,58 @@ const WordToJPGPage = () => {
                 ? 'Login Required' 
                 : isConverting 
                   ? 'Converting...' 
-                  : 'Convert to JPG'}
-            </button>
+                  : 'Convert to JPG'}            </button>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections 
+            serviceName="Word to JPG Converter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload Word",
+                desc: "Drag & drop or click to select your Word document",
+                icon: "📝",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                step: "2",
+                title: "Convert to JPG",
+                desc: "Our tool converts your Word document to high-quality JPG images",
+                icon: "🖼️",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                step: "3",
+                title: "Download Images",
+                desc: "Get your JPG images ready for sharing and use",
+                icon: "📥",
+                color: "from-green-500 to-emerald-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Sarah Wilson",
+                role: "Social Media Manager",
+                text: "Perfect for creating social media content from Word docs. The image quality is excellent!",
+                rating: 5,
+                avatar: "📱"
+              },
+              {
+                name: "David Chen",
+                role: "Teacher",
+                text: "Great for converting worksheets to images for online learning. Easy to use and reliable.",
+                rating: 5,
+                avatar: "👨‍🏫"
+              },
+              {
+                name: "Lisa Garcia",
+                role: "Designer",
+                text: "Useful tool for converting text documents to images for design projects. Quality results every time.",
+                rating: 5,
+                avatar: "🎨"
+              }
+            ]}
+            callToActionMessage="Ready to convert Word to JPG? Upload your document and create images!"          />
           </div>
         </div>
       </main>

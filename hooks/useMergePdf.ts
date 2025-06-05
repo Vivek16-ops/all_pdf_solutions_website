@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface MergePdfResponse {
@@ -11,6 +11,8 @@ interface MergePdfResponse {
 export const useMergePdf = () => {
   const [loading, setLoading] = useState(false);
   const [mergedPdfBase64, setMergedPdfBase64] = useState<string | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
   const mergePdfs = async (files: File[]): Promise<boolean> => {
     if (!files || files.length < 2) {
@@ -43,12 +45,30 @@ export const useMergePdf = () => {
 
       if (!response.ok) {
         throw new Error(result.message || 'Failed to merge PDFs');
-      }
-
-      if (result.success && result.file) {
-        setMergedPdfBase64(result.file);
-        toast.success(result.message || 'PDFs merged successfully');
-        return true;
+      }      if (result.success && result.file) {
+        try {
+          // Store the base64 data
+          setMergedPdfBase64(result.file);
+          
+          // Create blob and blob URL for preview
+          const blob = base64ToBlob(result.file, 'application/pdf');
+          
+          // Clean up previous blob URL
+          if (pdfBlobUrl) {
+            URL.revokeObjectURL(pdfBlobUrl);
+          }
+          
+          const blobUrl = URL.createObjectURL(blob);
+          setPdfBlob(blob);
+          setPdfBlobUrl(blobUrl);
+          
+          toast.success(result.message || 'PDFs merged successfully');
+          return true;
+        } catch (error) {
+          console.error('Error processing merged PDF:', error);
+          toast.error('Error processing merged PDF. Please try again.');
+          return false;
+        }
       } else {
         throw new Error(result.message || 'Failed to merge PDFs');
       }
@@ -59,7 +79,6 @@ export const useMergePdf = () => {
       setLoading(false);
     }
   };
-
   const downloadMergedPdf = () => {
     if (!mergedPdfBase64) {
       toast.error('No merged PDF available to download');
@@ -67,7 +86,8 @@ export const useMergePdf = () => {
     }
 
     try {
-      const blob = base64ToBlob(mergedPdfBase64, 'application/pdf');
+      // Use existing blob if available, otherwise create new one
+      const blob = pdfBlob || base64ToBlob(mergedPdfBase64, 'application/pdf');
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -80,7 +100,6 @@ export const useMergePdf = () => {
       toast.error('Failed to download merged PDF');
     }
   };
-
   // Helper function to convert base64 to Blob
   const base64ToBlob = (base64: string, type: string): Blob => {
     const binaryString = window.atob(base64);
@@ -91,9 +110,19 @@ export const useMergePdf = () => {
     return new Blob([bytes], { type });
   };
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl);
+      }
+    };
+  }, [pdfBlobUrl]);
+
   return {
     loading,
     mergedPdfBase64,
+    pdfBlobUrl,
     mergePdfs,
     downloadMergedPdf
   };

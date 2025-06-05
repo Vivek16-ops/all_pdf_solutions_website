@@ -7,6 +7,7 @@ import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose } from "react-icons/io";
+import { ServiceSections } from '@/components/service-components';
 
 const PPTtoPDFPage = () => {
   const { isSignedIn } = useAuth();
@@ -156,13 +157,62 @@ const PPTtoPDFPage = () => {
                     ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white'
                     : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-md'
               }`}
-            >
-              {!isSignedIn 
+            >              {!isSignedIn 
                 ? 'Login Required' 
                 : isConverting 
                   ? 'Converting...' 
-                  : 'Convert to PDF'}
-            </button>
+                  : 'Convert to PDF'}            </button>
+
+          {/* Enhanced Features Section */}
+          <ServiceSections 
+            serviceName="PPT to PDF Converter"
+            steps={[
+              {
+                step: "1",
+                title: "Upload PPT",
+                desc: "Drag & drop or click to select your PowerPoint file",
+                icon: "📊",
+                color: "from-orange-500 to-red-500"
+              },
+              {
+                step: "2",
+                title: "Convert to PDF",
+                desc: "Our tool converts your presentation to PDF format",
+                icon: "🔄",
+                color: "from-purple-500 to-pink-500"
+              },
+              {
+                step: "3",
+                title: "Download PDF",
+                desc: "Get your professional PDF document instantly",
+                icon: "📄",
+                color: "from-green-500 to-emerald-500"
+              }
+            ]}
+            testimonials={[
+              {
+                name: "Rachel Green",
+                role: "Sales Manager",
+                text: "Perfect for converting our sales presentations to PDF. The formatting is always preserved perfectly.",
+                rating: 5,
+                avatar: "💼"
+              },
+              {
+                name: "Tom Anderson",
+                role: "Trainer",
+                text: "Great for converting training materials to PDF format. Easy to share with participants!",
+                rating: 5,
+                avatar: "🎓"
+              },
+              {
+                name: "Nina Patel",
+                role: "Marketing Director",
+                text: "Excellent tool for converting pitch decks to PDF. Professional results every time.",
+                rating: 5,
+                avatar: "📈"
+              }
+            ]}
+            callToActionMessage="Ready to convert your PowerPoint to PDF? Start now!"          />
           </div>
         </div>
       </main>
