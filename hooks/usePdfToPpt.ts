@@ -1,6 +1,39 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
+// Helper function to validate base64 data
+function isValidBase64(str: string): boolean {
+    try {
+        if (!str || typeof str !== 'string') {
+            return false;
+        }
+        
+        // Remove whitespace
+        const cleanStr = str.replace(/\s/g, '');
+        
+        // Check if string has valid base64 characters
+        const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+        if (!base64Regex.test(cleanStr)) {
+            return false;
+        }
+        
+        // Check if length is multiple of 4
+        if (cleanStr.length % 4 !== 0) {
+            return false;
+        }
+        
+        // Try to decode the string using atob (browser-safe)
+        try {
+            window.atob(cleanStr);
+            return true;
+        } catch (decodeError) {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
 interface ConversionResponse {
     success: boolean;
     message: string;
@@ -63,17 +96,23 @@ export const usePdfToPpt = () => {
         } finally {
             setIsConverting(false);
         }
-    };
-
-    const downloadPpt = () => {
+    };    const downloadPpt = () => {
         if (!pptFile) {
             toast.error('No PowerPoint file available to download');
             return;
         }
 
         try {
+            // Validate base64 data first
+            if (!isValidBase64(pptFile)) {
+                throw new Error('Invalid base64 data received from server');
+            }
+
+            // Clean the base64 string (remove any whitespace or newlines)
+            const cleanBase64 = pptFile.replace(/\s/g, '');
+            
             // Convert base64 to blob
-            const byteCharacters = atob(pptFile);
+            const byteCharacters = atob(cleanBase64);
             const byteNumbers = new Array(byteCharacters.length);
             
             for (let i = 0; i < byteCharacters.length; i++) {
@@ -102,7 +141,11 @@ export const usePdfToPpt = () => {
             toast.success('PowerPoint file downloaded successfully! 💾');
         } catch (error) {
             console.error('Download error:', error);
-            toast.error('Failed to download PowerPoint file');
+            if (error instanceof Error && error.message.includes('atob')) {
+                toast.error('Invalid file data received. Please try converting again.');
+            } else {
+                toast.error('Failed to download PowerPoint file');
+            }
         }
     };
 
