@@ -113,9 +113,8 @@ const CustomerReviews: React.FC<CustomerReviewsProps> = ({
                 </motion.span>
               ))}
             </div>
-            
-            <p className={`text-xs sm:text-sm italic leading-relaxed ${isDark ? 'text-purple-300/80' : 'text-purple-700/80'}`}>
-              "              &quot;{testimonial.text}&quot;"
+              <p className={`text-xs sm:text-sm italic leading-relaxed ${isDark ? 'text-purple-300/80' : 'text-purple-700/80'}`}>
+              &quot;{testimonial.text}&quot;
             </p>
           </motion.div>
         ))}

@@ -27,14 +27,12 @@ export async function POST(req: NextRequest) {
             success: true,
             message: 'File processed successfully.',
             file: base64File,
-        });
-
-    } catch (error: any) {
+        });    } catch (error: unknown) {
         console.error('Error processing file:', error);
         // Return a generic error response
         return NextResponse.json({
             success: false,
-            message: `An error occurred: ${error.message || 'Unknown error'}`,
+            message: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
         });
     }
 }

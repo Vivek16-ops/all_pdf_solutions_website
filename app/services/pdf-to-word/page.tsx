@@ -290,7 +290,7 @@ const PDFtoWordPage = () => {
       console.log('Preview content set with actual extracted text');
       setTimeout(() => setShowCelebration(false), 3000);
     }
-  }, [wordFile, extractedText, previewContent]);
+  }, [wordFile, extractedText, previewContent, extractionDetails]);
 
   const handleConvert = useCallback(async () => {
     if (!isSignedIn) {

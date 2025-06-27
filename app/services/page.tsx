@@ -29,11 +29,6 @@ interface TypingAnimationProps {
   delay?: number;
 }
 
-interface GlitchTextProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
 interface HolographicCardProps {
   children: React.ReactNode;
   className?: string;
@@ -404,6 +399,11 @@ const TypingAnimation: React.FC<TypingAnimationProps> = ({ text, className = "",
 
 // New: Glitch Text Effect (unused - commented out)
 /*
+interface GlitchTextProps {
+  text: string;
+  className?: string;
+}
+
 const GlitchText: React.FC<GlitchTextProps> = ({ children, className = "" }) => {
   return (
     <motion.div className={`relative ${className}`}>

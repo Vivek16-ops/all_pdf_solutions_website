@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import PDFParser from 'pdf2json';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+
+interface PDFText {
+    R: Array<{ T: string }>;
+    x: number;
+    y: number;
+    w?: number;
+}
+
+interface ProcessedText {
+    x: number;
+    text: string;
+    width: number;
+}
+
+interface PDFPage {
+    Texts?: PDFText[];
+}
+
+interface PDFData {
+    Pages?: PDFPage[];
+}
 
 interface ConversionResponse {
     success: boolean;
@@ -14,21 +32,19 @@ interface ConversionResponse {
 }
 
 // Helper function to extract table structure from PDF data
-function extractTableFromPDF(pdfData: any): string[][] {
+function extractTableFromPDF(pdfData: PDFData): string[][] {
     const tableData: string[][] = [];
     
     if (!pdfData || !pdfData.Pages) {
         return tableData;
     }
-    
-    // Process each page
-    pdfData.Pages.forEach((page: any) => {
+      // Process each page
+    pdfData.Pages.forEach((page: PDFPage) => {
         if (!page.Texts) return;
+          // Group texts by Y position (rows) and sort by X position (columns)
+        const textsByRow = new Map<number, ProcessedText[]>();
         
-        // Group texts by Y position (rows) and sort by X position (columns)
-        const textsByRow = new Map<number, any[]>();
-        
-        page.Texts.forEach((text: any) => {
+        page.Texts.forEach((text: PDFText) => {
             if (text.R && text.R.length > 0) {
                 // Use more precise Y position grouping for better row detection
                 const yPosition = Math.round(text.y * 10) / 10; // Round to 1 decimal place
@@ -38,25 +54,23 @@ function extractTableFromPDF(pdfData: any): string[][] {
                 }
                 
                 // Extract the actual text content
-                let textContent = '';
-                text.R.forEach((run: any) => {
+                let textContent = '';                text.R.forEach((run: { T: string }) => {
                     if (run.T) {
                         textContent += decodeURIComponent(run.T);
                     }
                 });
-                
-                if (textContent.trim()) {
-                    textsByRow.get(yPosition)?.push({
+                  if (textContent.trim()) {
+                    const processedText: ProcessedText = {
                         x: text.x,
                         text: textContent.trim(),
                         width: text.w || 0
-                    });
+                    };
+                    textsByRow.get(yPosition)?.push(processedText);
                 }
             }
         });
-        
-        // Merge rows that are very close to each other (same logical row)
-        const mergedRows = new Map<number, any[]>();
+          // Merge rows that are very close to each other (same logical row)
+        const mergedRows = new Map<number, ProcessedText[]>();
         const sortedYPositions = Array.from(textsByRow.keys()).sort((a, b) => a - b);
         
         let currentRowGroup = sortedYPositions[0];
@@ -150,15 +164,15 @@ function extractTableFromPDF(pdfData: any): string[][] {
 }
 
 // Fallback function to extract simple text
-function extractSimpleText(pdfData: any): string {
+function extractSimpleText(pdfData: PDFData): string {
     let fullText = '';
     
     if (pdfData && pdfData.Pages) {
-        pdfData.Pages.forEach((page: any) => {
+        pdfData.Pages.forEach((page: PDFPage) => {
             if (page.Texts) {
-                page.Texts.forEach((text: any) => {
+                page.Texts.forEach((text: PDFText) => {
                     if (text.R) {
-                        text.R.forEach((run: any) => {
+                        text.R.forEach((run: { T: string }) => {
                             if (run.T) {
                                 fullText += decodeURIComponent(run.T) + ' ';
                             }
@@ -206,14 +220,13 @@ export async function POST(request: NextRequest) {
         let tableData: string[][] = [];
         try {
             // Parse PDF using pdf2json
-            const pdfParser = new PDFParser();
-              // Parse PDF from buffer
-            const parsedData = await new Promise<any>((resolve, reject) => {
-                pdfParser.on('pdfParser_dataError', (errData: any) => {
+            const pdfParser = new PDFParser();            // Parse PDF from buffer
+            const parsedData = await new Promise<PDFData>((resolve, reject) => {
+                pdfParser.on('pdfParser_dataError', (errData: { parserError: string }) => {
                     reject(new Error(`PDF parsing error: ${errData.parserError}`));
                 });
                 
-                pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+                pdfParser.on('pdfParser_dataReady', (pdfData: PDFData) => {
                     try {
                         resolve(pdfData);
                     } catch (parseError) {
@@ -223,7 +236,7 @@ export async function POST(request: NextRequest) {
                 
                 // Parse the PDF buffer
                 pdfParser.parseBuffer(pdfBuffer);
-            });            // Process PDF data to extract table structure
+            });// Process PDF data to extract table structure
             tableData = extractTableFromPDF(parsedData);
             
             if (tableData.length > 0) {
@@ -253,14 +266,12 @@ export async function POST(request: NextRequest) {
                 rows.forEach((row: string) => {
                     worksheet.addRow([row]);
                 });
-            }
-
-            // Auto-fit columns
+            }            // Auto-fit columns
             worksheet.columns.forEach((column: Partial<ExcelJS.Column>, index: number) => {
                 const columnLetter = String.fromCharCode(65 + index); // A, B, C, etc.
                 const maxLength = Math.max(
                     ...worksheet.getColumn(columnLetter).values
-                        .map((value: any) => value ? value.toString().length : 0)
+                        .map((value: ExcelJS.CellValue) => value ? value.toString().length : 0)
                         .filter((length: number) => length > 0),
                     10 // minimum width
                 );

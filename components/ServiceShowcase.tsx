@@ -206,7 +206,7 @@ const ServiceShowcase = () => {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
         >
-          {services.map((service, index) => {
+          {services.map((service) => {
             const colors = getColorClasses(service.color);
             return (
               <motion.div key={service.href} variants={item}>

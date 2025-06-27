@@ -3,9 +3,9 @@ import ExcelJS from 'exceljs';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 // Dynamic imports for pdfmake to work in Next.js environment
-let pdfMakeModule: any = null;
+let pdfMakeModule: typeof import('pdfmake/build/pdfmake') | null = null;
 
-export async function initializePdfMake() {
+async function initializePdfMake() {
   if (!pdfMakeModule) {
     try {
       const pdfMake = await import('pdfmake/build/pdfmake');
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     
     // Get the file from form data
     const formData = await req.formData();
-    const file = formData.get('file');    if (!file || !(file instanceof Blob)) {
+    const file = formData.get('file') as File | null;    if (!file || !(file instanceof Blob)) {
       return NextResponse.json(
         { success: false, message: 'No valid file provided' },
         { status: 400 }
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
             if (cell.value === null || cell.value === undefined) {
               value = '';
             } else if (cell.type === ExcelJS.ValueType.Date) {
-              const date = cell.value instanceof Date ? cell.value : new Date(cell.value as any);
+              const date = cell.value instanceof Date ? cell.value : new Date(cell.value as string | number);
               value = date.toLocaleDateString();
             } else if (cell.type === ExcelJS.ValueType.Number) {
               value = cell.value.toString();

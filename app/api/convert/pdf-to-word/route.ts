@@ -1,15 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 // Use pdf2json instead of pdf-parse to avoid ENOENT errors
-const PDFParser = require('pdf2json');
+import PDFParser from 'pdf2json';
 
 // Interface for extracted PDF content
 interface ExtractedContent {
   text: string;
   pages: number;
-  info?: any;
-  metadata?: any;
+  info?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
+interface PDFTextRun {
+  T: string;
+}
+
+interface PDFTextItem {
+  R: PDFTextRun[];
+}
+
+interface PDFPage {
+  Texts: PDFTextItem[];
+}
+
+interface PDFData {
+  Pages: PDFPage[];
+  Meta?: Record<string, unknown>;
 }
 
 /**
@@ -23,14 +40,13 @@ async function extractPdfContent(pdfBuffer: Buffer): Promise<ExtractedContent> {
     try {
       // Create a new PDF parser instance
       const pdfParser = new PDFParser();
-      
-      // Set up event handlers
-      pdfParser.on('pdfParser_dataError', (errData: any) => {
+        // Set up event handlers
+      pdfParser.on('pdfParser_dataError', (errData: { parserError: string }) => {
         console.error('PDF Parser Error:', errData.parserError);
         reject(new Error('Failed to parse PDF: ' + errData.parserError));
       });
       
-      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+      pdfParser.on('pdfParser_dataReady', (pdfData: PDFData) => {
         try {
           // Extract text from all pages
           let extractedText = '';
@@ -38,12 +54,11 @@ async function extractPdfContent(pdfBuffer: Buffer): Promise<ExtractedContent> {
           
           if (pdfData.Pages && Array.isArray(pdfData.Pages)) {
             pageCount = pdfData.Pages.length;
-            
-            pdfData.Pages.forEach((page: any) => {
+              pdfData.Pages.forEach((page: PDFPage) => {
               if (page.Texts && Array.isArray(page.Texts)) {
-                page.Texts.forEach((textItem: any) => {
+                page.Texts.forEach((textItem: PDFTextItem) => {
                   if (textItem.R && Array.isArray(textItem.R)) {
-                    textItem.R.forEach((textRun: any) => {
+                    textItem.R.forEach((textRun: PDFTextRun) => {
                       if (textRun.T) {
                         // Decode the text and add it to the extracted text
                         const decodedText = decodeURIComponent(textRun.T);
@@ -92,7 +107,7 @@ async function extractPdfContent(pdfBuffer: Buffer): Promise<ExtractedContent> {
  * @param originalFilename - Original PDF filename for reference
  * @returns Promise<Buffer> - Word document buffer
  */
-async function createWordDocument(extractedContent: ExtractedContent, originalFilename: string): Promise<Buffer> {
+async function createWordDocument(extractedContent: ExtractedContent): Promise<Buffer> {
   // Preserve original text formatting by splitting on single line breaks
   const lines = extractedContent.text.split('\n');
     // Create document sections
@@ -120,10 +135,8 @@ async function createWordDocument(extractedContent: ExtractedContent, originalFi
 
     // Detect indentation level from original text
     const leadingSpaces = line.length - line.trimStart().length;
-    const indentLevel = Math.floor(leadingSpaces / 4) * 240; // Convert to twips
-
-    // Detect text alignment based on content positioning
-    let alignment = 'left';
+    const indentLevel = Math.floor(leadingSpaces / 4) * 240; // Convert to twips    // Detect text alignment based on content positioning
+    let alignment: 'left' | 'center' | 'right' = 'left';
     if (line.trim().length < 50 && leadingSpaces > 20) {
       alignment = 'center';
     } else if (leadingSpaces > 40) {
@@ -140,7 +153,7 @@ async function createWordDocument(extractedContent: ExtractedContent, originalFi
             color: '000000', // Keep original black text
           }),
         ],
-        alignment: alignment as any,
+        alignment: alignment,
         indent: {
           left: indentLevel,
         },
@@ -250,10 +263,8 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
-    }
-
-    // Create Word document from extracted content
-    const wordBuffer = await createWordDocument(extractedContent, file.name);
+    }    // Create Word document from extracted content
+    const wordBuffer = await createWordDocument(extractedContent);
 
     // Convert buffer to base64 for client download
     const base64Word = wordBuffer.toString('base64');    // Return success response with Word document and extraction details

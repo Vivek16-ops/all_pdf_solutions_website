@@ -20,16 +20,14 @@ const ExcelToPDFPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const { isConverting, pdfBlobUrl, downloadPdf, convertExcelToPdf } = useExcelToPdf();
     // Enhanced state management
-  const [conversionProgress, setConversionProgress] = useState(0);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [fileInfo, setFileInfo] = useState<{size: string, estimatedTime?: string} | null>(null);
+  const [conversionProgress, setConversionProgress] = useState(0);  const [fileInfo, setFileInfo] = useState<{size: string, estimatedTime?: string} | null>(null);
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [userRating, setUserRating] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   
   // Excel preview state
   const [showExcelPreview, setShowExcelPreview] = useState(false);
-  const [excelData, setExcelData] = useState<any[][]>([]);
+  const [excelData, setExcelData] = useState<string[][]>([]);
   const [excelSheets, setExcelSheets] = useState<string[]>([]);
   const [activeSheet, setActiveSheet] = useState<string>('');
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
@@ -52,26 +50,27 @@ const ExcelToPDFPage = () => {
       }
     };
 
-    const interval = setInterval(showRandomTip, 15000);
-    return () => clearInterval(interval);
+    const interval = setInterval(showRandomTip, 15000);    return () => clearInterval(interval);
   }, [showTooltip, isConverting]);
 
   // Helper function to format file size
-  const formatFileSize = (bytes: number): string => {
+  const formatFileSize = useCallback((bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  }, []);
+  
   // Estimate conversion time based on file size
-  const estimateConversionTime = (fileSize: number): string => {
+  const estimateConversionTime = useCallback((fileSize: number): string => {
     const sizeInMB = fileSize / (1024 * 1024);
     if (sizeInMB < 1) return '20-30 seconds';
     if (sizeInMB < 5) return '30-60 seconds';
     if (sizeInMB < 10) return '1-2 minutes';
     return '2-3 minutes';
-  };
+  }, []);
+
   // Excel preview function
   const handleExcelPreview = useCallback(async () => {
     if (!file) return;
@@ -90,22 +89,22 @@ const ExcelToPDFPage = () => {
       // Set the first sheet as active
       const firstSheet = sheetNames[0];
       setActiveSheet(firstSheet);
-      
-      // Get the first worksheet
+        // Get the first worksheet
       const worksheet = workbook.getWorksheet(firstSheet);
       if (!worksheet) {
         throw new Error('No worksheet found');
       }
       
       // Convert worksheet to array format
-      const jsonData: any[][] = [];
+      const jsonData: string[][] = [];
       
       // Get the actual range of data (up to 20 rows and 10 columns for preview)
       const maxRows = Math.min(worksheet.actualRowCount || 20, 20);
       const maxCols = Math.min(worksheet.actualColumnCount || 10, 10);
       
+      // Fix the first function's types
       for (let rowNum = 1; rowNum <= maxRows; rowNum++) {
-        const row: any[] = [];
+        const row: string[] = [];
         const worksheetRow = worksheet.getRow(rowNum);
         
         for (let colNum = 1; colNum <= maxCols; colNum++) {
@@ -119,7 +118,7 @@ const ExcelToPDFPage = () => {
               cellValue = cell.value.result?.toString() || '';
             } else if (typeof cell.value === 'object' && 'richText' in cell.value) {
               // Handle rich text cells
-              cellValue = cell.value.richText?.map((rt: any) => rt.text).join('') || '';
+              cellValue = cell.value.richText?.map((rt: { text: string }) => rt.text).join('') || '';
             } else {
               cellValue = cell.value.toString();
             }
@@ -170,14 +169,15 @@ const ExcelToPDFPage = () => {
       }
       
       // Convert worksheet to array format
-      const jsonData: any[][] = [];
+      const jsonData: string[][] = [];
       
       // Get the actual range of data (up to 20 rows and 10 columns for preview)
       const maxRows = Math.min(worksheet.actualRowCount || 20, 20);
       const maxCols = Math.min(worksheet.actualColumnCount || 10, 10);
       
+      // Fix the second function's types  
       for (let rowNum = 1; rowNum <= maxRows; rowNum++) {
-        const row: any[] = [];
+        const row: string[] = [];
         const worksheetRow = worksheet.getRow(rowNum);
         
         for (let colNum = 1; colNum <= maxCols; colNum++) {
@@ -191,7 +191,7 @@ const ExcelToPDFPage = () => {
               cellValue = cell.value.result?.toString() || '';
             } else if (typeof cell.value === 'object' && 'richText' in cell.value) {
               // Handle rich text cells
-              cellValue = cell.value.richText?.map((rt: any) => rt.text).join('') || '';
+              cellValue = cell.value.richText?.map((rt: { text: string }) => rt.text).join('') || '';
             } else {
               cellValue = cell.value.toString();
             }
@@ -223,15 +223,10 @@ const ExcelToPDFPage = () => {
       
       // Set file info
       const sizeFormatted = formatFileSize(selectedFile.size);
-      const estimatedTime = estimateConversionTime(selectedFile.size);
-      setFileInfo({
+      const estimatedTime = estimateConversionTime(selectedFile.size);      setFileInfo({
         size: sizeFormatted,
         estimatedTime: estimatedTime
       });
-
-      // Create file preview
-      const fileURL = URL.createObjectURL(selectedFile);
-      setFilePreview(fileURL);
       
       toast.success('📊 Excel file added successfully! ✨', {
         icon: '🎉',
@@ -252,9 +247,9 @@ const ExcelToPDFPage = () => {
       'application/vnd.ms-excel': ['.xls']
     },
     maxFiles: 1,
-    disabled: !isSignedIn
-  }); 
-  // Enhanced conversion logic with progress simulation
+    disabled: !isSignedIn  }); 
+  
+  // Enhanced conversion logic with progress simulation  
   const handleConvert = useCallback(async () => {
     if (!isSignedIn) {
       toast.error('Please login to convert files');
@@ -293,14 +288,12 @@ const ExcelToPDFPage = () => {
           borderRadius: '10px',
           background: isDark ? '#333' : '#fff',
           color: isDark ? '#fff' : '#333',
-        },
-      });
+        },  });
 
       setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 3000);
       setFile(null);
       setFileInfo(null);
-      setFilePreview(null);
     } catch (error) {
       console.error('Error converting file:', error);
       clearInterval(progressInterval);
@@ -315,15 +308,15 @@ const ExcelToPDFPage = () => {
       setTimeout(() => setConversionProgress(0), 2000);
     }
   }, [file, isSignedIn, convertExcelToPdf, isDark]);
-  // Enhanced remove file handler
+    // Enhanced remove file handler
   const handleRemoveFile = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); 
     setFile(null);
-    setFilePreview(null);
     setFileInfo(null);
     setConversionProgress(0);
     toast.success('🗑️ File removed successfully!');
   }, []);
+
   if (!mounted) {
     return (
       <>
@@ -1205,7 +1198,7 @@ const ExcelToPDFPage = () => {
                 <div className={`flex gap-2 p-4 border-b overflow-x-auto ${
                   isDark ? 'border-gray-700' : 'border-gray-200'
                 }`}>
-                  {excelSheets.map((sheetName, index) => (
+                  {excelSheets.map((sheetName) => (
                     <motion.button
                       key={sheetName}
                       onClick={() => handleSheetChange(sheetName)}

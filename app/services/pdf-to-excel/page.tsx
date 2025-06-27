@@ -59,24 +59,23 @@ const PDFtoExcelPage = () => {
     const interval = setInterval(showRandomTip, 15000);
     return () => clearInterval(interval);
   }, [showTooltip, isConverting]);
-
   // Helper function to format file size
-  const formatFileSize = (bytes: number): string => {
+  const formatFileSize = useCallback((bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  }, []);
 
   // Estimate conversion time based on file size
-  const estimateConversionTime = (fileSize: number): string => {
+  const estimateConversionTime = useCallback((fileSize: number): string => {
     const sizeInMB = fileSize / (1024 * 1024);
     if (sizeInMB < 1) return '30-45 seconds';
     if (sizeInMB < 5) return '45-90 seconds';
     if (sizeInMB < 10) return '1-3 minutes';
     return '3-5 minutes';
-  };
+  }, []);
   // Enhanced file drop handler
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!isSignedIn) {
@@ -91,11 +90,7 @@ const PDFtoExcelPage = () => {
       const sizeFormatted = formatFileSize(selectedFile.size);
       const estimatedTime = estimateConversionTime(selectedFile.size);
       setFileInfo({
-        size: sizeFormatted,        estimatedTime: estimatedTime
-      });
-
-      // Create file preview
-      const fileURL = URL.createObjectURL(selectedFile);
+        size: sizeFormatted,        estimatedTime: estimatedTime      });
       
       toast.success('📄 PDF file added successfully! ✨', {
         icon: '🎉',

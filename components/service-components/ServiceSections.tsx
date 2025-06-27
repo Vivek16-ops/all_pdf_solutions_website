@@ -6,7 +6,6 @@ import HowItWorks from './HowItWorks';
 import CustomerReviews from './CustomerReviews';
 import CallToAction from './CallToAction';
 import { motion } from 'framer-motion';
-import { useTheme } from '@/hooks/useTheme';
 
 interface ServiceSectionsProps {
   serviceName?: string;
@@ -45,9 +44,8 @@ const ServiceSections: React.FC<ServiceSectionsProps> = ({
   howItWorksTitle,
   callToActionMessage
 }) => {
-  const { isDark } = useTheme();
   
-  return (    <motion.div
+  return (<motion.div
       className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6 sm:pt-6 sm:pb-8 lg:pt-8 lg:pb-10 space-y-8 sm:space-y-10 lg:space-y-12"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}

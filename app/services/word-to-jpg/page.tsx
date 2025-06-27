@@ -58,12 +58,6 @@ const WordToJPGPage = () => {
       setIsConverting(false);
     }
   };
-
-  const removeFile = useCallback(() => {
-    setFile(null);
-    toast.success('File removed');
-  }, []);
-
   const handleRemoveFile = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dropzone from opening file dialog
     setFile(null);
