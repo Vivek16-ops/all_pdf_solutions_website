@@ -81,7 +81,11 @@ const ServiceShowcase = () => {
   const { isDark } = useTheme();
 
   const getColorClasses = (color: string) => {
-    const colorMap: Record<string, any> = {
+    const colorMap: Record<string, {
+      bg: string;
+      glow: string;
+      hover: string;
+    }> = {
       purple: {
         bg: isDark ? 'from-purple-600/20 to-purple-800/20' : 'from-purple-100 to-purple-200',
         glow: isDark ? 'shadow-purple-500/20' : 'shadow-purple-300/30',

@@ -8,7 +8,7 @@ import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/hooks/useTheme';
 import { IoMdClose, IoMdInformationCircle } from "react-icons/io";
-import { FaDownload, FaExternalLinkAlt, FaFilePdf, FaPlus, FaFolderOpen, FaStar, FaMagic, FaRocket, FaEye, FaClock, FaFileImage, FaSpinner, FaTimes, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { FaDownload, FaExternalLinkAlt, FaFilePdf, FaPlus, FaFolderOpen, FaStar, FaMagic, FaRocket, FaClock, FaFileImage, FaSpinner, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { BsFillFileEarmarkPdfFill } from 'react-icons/bs';
 import { useMergePdf } from '@/hooks/useMergePdf';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -177,7 +177,7 @@ const MergePDFPage = () => {
       toast.success('📄 File moved down!');
     }
   }, [files.length]);
-  const { loading, mergedPdfBase64, pdfBlobUrl, mergePdfs, downloadMergedPdf } = useMergePdf();
+  const { pdfBlobUrl, mergePdfs, downloadMergedPdf } = useMergePdf();
   // Enhanced merging logic with progress simulation
   const handleMerge = useCallback(async () => {
     if (!isSignedIn) {

@@ -10,7 +10,7 @@ interface HerosectionProps {
 }
 
 const Herosection: React.FC<HerosectionProps> = (props) => {
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
 
@@ -206,7 +206,7 @@ const Herosection: React.FC<HerosectionProps> = (props) => {
               }}
             />
             
-            <span className="relative z-20 font-black">Get Started - It's Free!</span>
+            <span className="relative z-20 font-black">Get Started - It&apos;s Free!</span>
           </motion.div>
         </motion.div>        {/* Purple-themed trust indicators (no glow animations) */}
         <motion.div

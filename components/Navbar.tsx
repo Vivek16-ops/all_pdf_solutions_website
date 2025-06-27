@@ -13,7 +13,7 @@ import { setTheme } from '@/store/themeSlice';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

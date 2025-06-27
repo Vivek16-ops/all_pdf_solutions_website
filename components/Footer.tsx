@@ -12,7 +12,7 @@ const paymentLogos = [
 ];
 
 const Footer = () => {
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [mounted, setMounted] = React.useState(false);
   const [isDark, setIsDark] = React.useState(false);
 

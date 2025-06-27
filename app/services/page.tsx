@@ -6,7 +6,7 @@ import { ReduxProvider } from '@/store/Provider';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
 // TypeScript interfaces
 interface MousePosition {
@@ -402,7 +402,8 @@ const TypingAnimation: React.FC<TypingAnimationProps> = ({ text, className = "",
   );
 };
 
-// New: Glitch Text Effect
+// New: Glitch Text Effect (unused - commented out)
+/*
 const GlitchText: React.FC<GlitchTextProps> = ({ children, className = "" }) => {
   return (
     <motion.div className={`relative ${className}`}>
@@ -438,6 +439,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({ children, className = "" }) => 
     </motion.div>
   );
 };
+*/
 
 // New: Holographic Card Effect
 const HolographicCard: React.FC<HolographicCardProps> = ({ children, className = "" }) => {
@@ -519,13 +521,11 @@ const staggerContainer = {
   }
 };
 
-const ServicesContent = () => {
-  const [mounted, setMounted] = React.useState(false);
+const ServicesContent = () => {  const [mounted, setMounted] = React.useState(false);
   const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
-  const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = React.useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -536,19 +536,16 @@ const ServicesContent = () => {
   });
   
   const y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   // Mouse tracking for interactive effects
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-      const handleScroll = () => {
+    };      const handleScroll = () => {
       const scrollTop = window.pageYOffset;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       
-      setScrollY(scrollTop);
       setScrollProgress(Math.min(scrollPercent, 100));
     };
     

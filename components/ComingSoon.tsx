@@ -176,7 +176,7 @@ export default function ComingSoon({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.6 }}
         >
-          You've been waiting for: {Math.floor(countdown / 60)}m {countdown % 60}s
+          You&apos;ve been waiting for: {Math.floor(countdown / 60)}m {countdown % 60}s
         </motion.div>
       </div>
 

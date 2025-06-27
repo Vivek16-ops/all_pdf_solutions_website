@@ -2,10 +2,9 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks";
 import { motion } from "framer-motion";
-import { AiFillFilePdf, AiFillFileWord, AiFillFileExcel, AiFillFilePpt } from "react-icons/ai";
-import { BsFillFileEarmarkPdfFill, BsFileImage, BsImages } from "react-icons/bs";
-import { FaFileImport, FaFileExport } from "react-icons/fa";
-import { MdOutlineSplitscreen, MdBrandingWatermark, MdSecurity } from "react-icons/md";
+import { AiFillFilePdf } from "react-icons/ai";
+import { BsFileImage } from "react-icons/bs";
+import { MdSecurity } from "react-icons/md";
 
 const features = [
   {
@@ -56,7 +55,7 @@ const item = {
 };
 
 const Features: React.FC = () => {
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = React.useState(false);
 
   React.useEffect(() => {

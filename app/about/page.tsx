@@ -72,7 +72,7 @@ const teamMembers: TeamMember[] = [
 ];
 
 const AboutPageContent = () => {
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
 
@@ -136,7 +136,7 @@ const AboutPageContent = () => {
               className={`text-lg mb-6 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
               variants={fadeInUp}
             >
-              At VI-Pdf-Solutions, we're dedicated to simplifying document management while maintaining the highest standards of security and privacy. Our platform is built on three core principles:
+              At VI-Pdf-Solutions, we&apos;re dedicated to simplifying document management while maintaining the highest standards of security and privacy. Our platform is built on three core principles:
             </motion.p>
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-3 gap-8"

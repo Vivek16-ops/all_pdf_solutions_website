@@ -10,8 +10,7 @@ import { IoMdClose, IoMdInformationCircle } from "react-icons/io";
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePdfToExcel } from '@/hooks/usePdfToExcel';
 import { BsFillFileEarmarkPdfFill, BsFileEarmarkExcel } from 'react-icons/bs';
-import { FaFileExcel, FaTable, FaMagic, FaStar, FaRocket, FaEye, FaClock, FaFileImage, FaSpinner, FaTimes } from 'react-icons/fa';
-import LoadingDots from '@/components/LoadingDots';
+import { FaFileExcel, FaTable, FaMagic, FaStar, FaRocket, FaClock, FaFileImage, FaSpinner, FaTimes } from 'react-icons/fa';
 import { ServiceSections } from '@/components/service-components';
 
 const PDFtoExcelPage = () => {
@@ -20,10 +19,8 @@ const PDFtoExcelPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const { isConverting, excelFile, previewData, fullData, convertPdfToExcel, downloadExcel } = usePdfToExcel();
-  
-  // Enhanced state management
+    // Enhanced state management
   const [conversionProgress, setConversionProgress] = useState(0);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [fileInfo, setFileInfo] = useState<{size: string, estimatedTime?: string} | null>(null);
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [userRating, setUserRating] = useState(0);
@@ -94,13 +91,11 @@ const PDFtoExcelPage = () => {
       const sizeFormatted = formatFileSize(selectedFile.size);
       const estimatedTime = estimateConversionTime(selectedFile.size);
       setFileInfo({
-        size: sizeFormatted,
-        estimatedTime: estimatedTime
+        size: sizeFormatted,        estimatedTime: estimatedTime
       });
 
       // Create file preview
       const fileURL = URL.createObjectURL(selectedFile);
-      setFilePreview(fileURL);
       
       toast.success('📄 PDF file added successfully! ✨', {
         icon: '🎉',
@@ -109,18 +104,19 @@ const PDFtoExcelPage = () => {
           background: isDark ? '#333' : '#fff',
           color: isDark ? '#fff' : '#333',
         },
-      });
-    }
+      });    }
   }, [isSignedIn, isDark, formatFileSize, estimateConversionTime]);
+  
   // Enhanced remove file handler
   const handleRemoveFile = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); 
     setFile(null);
-    setFilePreview(null);
     setFileInfo(null);
     setConversionProgress(0);
     toast.success('🗑️ File removed successfully!');
-  }, []);  // Enhanced conversion logic with progress simulation
+  }, []);
+  
+  // Enhanced conversion logic with progress simulation
   const handleConvert = useCallback(async () => {
     if (!isSignedIn) {
       toast.error('Please login to convert files');
@@ -160,13 +156,10 @@ const PDFtoExcelPage = () => {
           background: isDark ? '#333' : '#fff',
           color: isDark ? '#fff' : '#333',
         },
-      });
-
-      setShowCelebration(true);
+      });      setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 3000);
       setFile(null);
       setFileInfo(null);
-      setFilePreview(null);
     } catch (error) {
       console.error('Error converting file:', error);
       clearInterval(progressInterval);

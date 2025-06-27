@@ -152,7 +152,7 @@ const BackgroundElements = ({ isDark }: { isDark: boolean }) => (
 );
 
 export default function Home() {
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
 

@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar';
 
 const ContactPageContent = () => {
   // All hooks at the top
-  const theme = useAppSelector((state: any) => state.theme.theme);
+  const theme = useAppSelector((state: { theme: { theme: string } }) => state.theme.theme);
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
@@ -84,7 +84,7 @@ const ContactPageContent = () => {
               Get in Touch
             </h1>
             <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              We'd love to hear from you. Drop us a line and we'll get back to you as soon as possible.
+              We&apos;d love to hear from you. Drop us a line and we&apos;ll get back to you as soon as possible.
             </p>
           </div>
           
